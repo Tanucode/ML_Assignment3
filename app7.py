@@ -158,7 +158,7 @@ d1 = st.sidebar.selectbox("Embedding Size", ["32", "64", "128"])
 # Textboxes
 # block_size=int(d2)
 
-activation_choice = st.sidebar.selectbox("Select Activation Function", ["ReLU", "Tanh"])
+activation_choice = st.sidebar.selectbox("Select Activation Function", ["ReLu", "Tanh"])
 
 # Set context length options based on activation
 context_options = ["3", "5"] if activation_choice == "ReLU" else ["5", "10"]
