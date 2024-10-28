@@ -172,13 +172,21 @@ t2 = st.sidebar.text_input("Number of Words to predict", "")
 emb={"32":0,"64":1,"128":2}
 context={"3":0,"5":1}
 # Predict button
-if st.button("Predict"):
+if st.button("Predict") and (activation_choice =='ReLu'):
     # Create a new model with the user-specified embedding
     model1 = NextWordMLP(int(d2),len(stoi), int(d1), 10)
     # model_number=emb[str(d1)]*3+context[str(d2)]
     model_number=0
     # Load the pre-trained weights into the new model
-    model1.load_state_dict(torch.load(f"./model_e{int(d1)}_c{int(d2)}_{activation_choice}.pt"), strict=False)
+    model1.load_state_dict(torch.load(f"./model_e{int(d1)}_c{int(d2)}_ReLu.pt"), strict=False)
+elif st.button("Predict") and (activation_choice =='Tanh'):
+    model1 = NextWordMLP(int(d2),len(stoi), int(d1), 10)
+    # model_number=emb[str(d1)]*3+context[str(d2)]
+    model_number=0
+    # Load the pre-trained weights into the new model
+    model1.load_state_dict(torch.load(f"./model_e{int(d1)}_c{int(d2)}_Tanh.pt"), strict=False)
+    
+    
   
     model1.eval()
 # Use the scripted model for prediction
