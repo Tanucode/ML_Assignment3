@@ -49,19 +49,33 @@ import torch.nn as nn
 
 
 
-# class NextWordMLP(nn.Module):
-#     def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
-#         super().__init__()
-#         self.emb = nn.Embedding(vocab_size, emb_dim)
-#         self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
-#         self.lin2 = nn.Linear(hidden_size, vocab_size)
+class NextWordMLP1(nn.Module):
+    def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
+        super().__init__()
+        self.emb = nn.Embedding(vocab_size, emb_dim)
+        self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
+        self.lin2 = nn.Linear(hidden_size, vocab_size)
 
-#     def forward(self, x):
-#         x = self.emb(x)  # Convert word indices to embeddings
-#         x = x.view(x.shape[0], -1)  # Flatten embeddings
-#         x = torch.relu(self.lin1(x))  # First layer + ReLU activation
-#         x = self.lin2(x)  # Second layer, output vocab_size logits
-#         return x
+    def forward(self, x):
+        x = self.emb(x)  # Convert word indices to embeddings
+        x = x.view(x.shape[0], -1)  # Flatten embeddings
+        x = torch.relu(self.lin1(x))  # First layer + ReLU activation
+        x = self.lin2(x)  # Second layer, output vocab_size logits
+        return x
+
+class NextWordMLP2(nn.Module):
+    def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
+        super().__init__()
+        self.emb = nn.Embedding(vocab_size, emb_dim)
+        self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
+        self.lin2 = nn.Linear(hidden_size, vocab_size)
+
+    def forward(self, x):
+        x = self.emb(x)  # Convert word indices to embeddings
+        x = x.view(x.shape[0], -1)  # Flatten embeddings
+        x = torch.tanh(self.lin1(x))  # First layer + ReLU activation
+        x = self.lin2(x)  # Second layer, output vocab_size logits
+        return x
 
 
 # # def predict_next_words(input_text, k):
@@ -99,20 +113,20 @@ def predict_next_words(input_text, k):
     top_k_indices = torch.topk(predictions[0, :], k).indices
     return [itos[idx.item()] for idx in top_k_indices]
 
-class NextWordMLP(nn.Module):
-    def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
-        super().__init__()
-        self.emb = nn.Embedding(vocab_size, emb_dim)
-        self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
-        self.lin2 = nn.Linear(hidden_size, vocab_size)
-        self.activation = nn.ReLU() if activation_choice == 'ReLu' else nn.Tanh()
+# class NextWordMLP(nn.Module):
+#     def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
+#         super().__init__()
+#         self.emb = nn.Embedding(vocab_size, emb_dim)
+#         self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
+#         self.lin2 = nn.Linear(hidden_size, vocab_size)
+#         self.activation = nn.ReLU() if activation_choice == 'ReLu' else nn.Tanh()
 
-    def forward(self, x):
-        x = self.emb(x)  # Convert word indices to embeddings
-        x = x.view(x.shape[0], -1)  # Flatten embeddings
-        x = self.activation(self.lin1(x))  # First layer + activation
-        x = self.lin2(x)  # Second layer, output vocab_size logits
-        return x
+#     def forward(self, x):
+#         x = self.emb(x)  # Convert word indices to embeddings
+#         x = x.view(x.shape[0], -1)  # Flatten embeddings
+#         x = self.activation(self.lin1(x))  # First layer + activation
+#         x = self.lin2(x)  # Second layer, output vocab_size logits
+#         return x
 
 # def replace_oov_words(input_text):
 #     processed_words = []
@@ -175,14 +189,14 @@ context={"3":0,"5":1}
 if st.button("Predict"):
     if (activation_choice == 'ReLu'):
         # Create a new model with the user-specified embedding
-        model1 = NextWordMLP(int(d2),len(stoi), int(d1), 10)
+        model1 = NextWordMLP1(int(d2),len(stoi), int(d1), 10)
         # model_number=emb[str(d1)]*3+context[str(d2)]
         model_number=0
         # Load the pre-trained weights into the new model
         model1.load_state_dict(torch.load(f"./model_e{int(d1)}_c{int(d2)}_ReLu.pt"), strict=False)
     else:
          # Create a new model with the user-specified embedding
-        model1 = NextWordMLP(int(d2),len(stoi), int(d1), 10)
+        model1 = NextWordMLP2(int(d2),len(stoi), int(d1), 10)
         # model_number=emb[str(d1)]*3+context[str(d2)]
         model_number=0
         # Load the pre-trained weights into the new model
@@ -200,20 +214,3 @@ if st.button("Predict"):
 
 
 
-# st.markdown(
-#     """
-#     <style>
-#     .css-1aumxhk { background-color: #F0F2F6; }
-#     .stButton>button { 
-#         font-size: 1.1em; 
-#         font-weight: bold; 
-#         background-color: #4CAF50; 
-#         color: white; 
-#         border: none;
-#         padding: 10px 20px;
-#         margin-top: 10px;
-#     }
-#     .stTextInput>input { font-size: 1.1em; }
-#     </style>
-#     """, unsafe_allow_html=True
-# )
