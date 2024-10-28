@@ -100,12 +100,12 @@ import torch.nn as nn
 #     return [itos[idx.item()] for idx in top_k_indices]
 
 class NextWordMLP(nn.Module):
-    def __init__(self, block_size, vocab_size, emb_dim, hidden_size, activation='relu'):
+    def __init__(self, block_size, vocab_size, emb_dim, hidden_size):
         super().__init__()
         self.emb = nn.Embedding(vocab_size, emb_dim)
         self.lin1 = nn.Linear(block_size * emb_dim, hidden_size)
         self.lin2 = nn.Linear(hidden_size, vocab_size)
-        self.activation = nn.ReLU() if activation == 'relu' else nn.Tanh()
+        self.activation = nn.ReLU() if activation_choice == 'ReLu' else nn.Tanh()
 
     def forward(self, x):
         x = self.emb(x)  # Convert word indices to embeddings
@@ -161,7 +161,7 @@ d1 = st.sidebar.selectbox("Embedding Size", ["32", "64", "128"])
 activation_choice = st.sidebar.selectbox("Select Activation Function", ["ReLu", "Tanh"])
 
 # Set context length options based on activation
-context_options = ["3", "5"] if activation_choice == "ReLU" else ["5", "10"]
+context_options = ["3", "5"] if activation_choice == "ReLu" else ["5", "10"]
 d2 = st.sidebar.selectbox("Context Length", context_options)
 
 
