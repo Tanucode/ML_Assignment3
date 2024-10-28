@@ -78,7 +78,7 @@ if st.button("Predict"):
     try:
         # Initialize and load model based on user input
         model = NextWordMLP(block_size, len(stoi), int(embedding_size), 10, activation_choice)
-        model_file = f"model_{embedding_size}_c{context_length}_{activation_choice}.pt"
+        model_file = f"model_e{embedding_size}_c{context_length}_{activation_choice}.pt"
         model.load_state_dict(torch.load(model_file), strict=False)
         model.eval()
 
